@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  demo1-sam
+  Sample SAM Template for demo1-sam
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function # tipe resource
+    Properties:
+#      CodeUri: hello_world/
+#      Handler: app.lambda_handler
+      Handler: index.handler
+#      Runtime: python3.9
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+        Test:
+          Type: Api
+          Properties:
+            Path: /erick
+            Method: post
+        Swagger:
+          Type: Api
+          Properties:
+            Path: /erick/swagger
+            Method: get
+

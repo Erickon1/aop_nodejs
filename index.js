@@ -1,25 +1,45 @@
-console.log('Loading function');
-const getAccessKeyId = process.env.accessKeyId;
-const getSecretAccessKey = process.env.secretAccessKey;
-const myregion = process.env.AWS_REGION;
-
-const aws = require('aws-sdk');
-aws.config.update({region: myregion});
-//aws.config.update({accessKeyId: 'mykey', secretAccessKey: 'mysecret', region: 'myregion'});
-const s3 = new aws.S3({ apiVersion: '2006-03-01' });
+const { Hello } = require("./service/Hello.js");
+const { Hello2 } = require("./service/Hello2.js");
+const logger = require('./logger/logger.js');
+const { setRequestId } = require("./logger/aop.js")
 
 exports.handler = async (event, context) => {
-  console.log("myregion", myregion);
-  console.log("getAccessKeyId", getAccessKeyId);
-  console.log("getSecretAccessKey", getSecretAccessKey);
+  //siempre al inicio para seguir la traza
+  setRequestId(context.awsRequestId)
+
+
+  const hello = new Hello()
+  const hello2 = new Hello2()
+  hello.add(2,2)
+  let res = hello.response();
+  hello2.add(2,2)
+  hello.creds("erick", "roberto","blabla")
+  hello.defaults(url="erick")
+
+  logger.log('info', 'Pass a message and this works', {
+    label: 'labeeeeeeelll'
+  });
+  // return context.logStreamName;
+
   try {
-    var list = await s3.listBuckets().promise();
-    for (var i in list.Buckets) {
-      console.log(list.Buckets[i].Name);
-    }
-    return "hola";
+    logger.info("Server Sent A Hello World!");
+    /*
+       //this not works on this format
+    logger.log('info', 'Pass a message and this works', {
+      additional: 'properties',
+      are: 'passed along'
+    });
+
+    logger.info('Use a helper method if you want', {
+      additional: 'properties',
+      are: 'passed along'
+    });
+    */
+    return hello.response();
+
   } catch (error) {
-    console.log("Error al listar los buckets");
+    console.log( error )
     throw new Error(error);
   }
+
 };
